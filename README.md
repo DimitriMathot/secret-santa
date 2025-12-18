@@ -1,59 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎅 Secret Santa Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application web privée de Secret Santa construite avec Laravel 11, Blade et Alpine.js.
 
-## About Laravel
+## ✨ Fonctionnalités
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- ✅ **Pas de comptes utilisateur** - Accès direct pour l'admin
+- ✅ **Accès basé sur tokens** - Chaque participant reçoit un token unique
+- ✅ **Gestion des exclusions** - Les participants peuvent exclure d'autres personnes
+- ✅ **Assignations cryptées** - L'admin ne peut jamais voir les assignations
+- ✅ **Notifications email** - Les participants reçoivent un email avec leur lien unique
+- ✅ **UI en français** - Interface entièrement en français
+- ✅ **Architecture propre** - Code organisé avec services et tests
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **Installer les dépendances**
+   ```bash
+   composer install
+   npm install
+   ```
 
-## Learning Laravel
+2. **Configurer l'environnement**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+3. **Configurer la base de données**
+   - Modifier `.env` avec vos paramètres de base de données
+   - Par défaut, SQLite est utilisé : `database/database.sqlite`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. **Lancer les migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-## Laravel Sponsors
+5. **Compiler les assets** (pour la production)
+   ```bash
+   npm run build
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   Ou en mode développement :
+   ```bash
+   npm run dev
+   ```
 
-### Premium Partners
+## 📧 Configuration Email
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Dans votre fichier `.env`, configurez l'envoi d'emails :
 
-## Contributing
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@example.com
+MAIL_FROM_NAME="Secret Santa"
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Pour le développement local, vous pouvez utiliser `MAIL_MAILER=log` pour voir les emails dans `storage/logs/laravel.log`.
 
-## Code of Conduct
+## 🎯 Utilisation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. **Créer un événement**
+   - Aller sur la page d'accueil
+   - Cliquer sur "Nouvel événement"
+   - Remplir les informations (nom, description, date)
 
-## Security Vulnerabilities
+2. **Ajouter des participants**
+   - Sur la page de l'événement, ajouter les participants avec leur nom et email
+   - Chaque participant reçoit automatiquement un token unique
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Définir les exclusions** (optionnel)
+   - Pour chaque participant, cliquer sur "Gérer exclusions"
+   - Sélectionner les personnes à exclure
 
-## License
+4. **Générer les assignations**
+   - Une fois qu'il y a au moins 3 participants, le bouton "Générer les assignations" apparaît
+   - Les assignations sont générées de manière aléatoire en respectant les exclusions
+   - Les emails sont envoyés automatiquement à tous les participants
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. **Accès participant**
+   - Chaque participant reçoit un email avec un lien unique
+   - Le lien contient leur token : `/participant/{token}`
+   - Ils peuvent voir à qui ils doivent offrir un cadeau
+
+## 🔒 Sécurité
+
+- Les assignations sont **cryptées** dans la base de données
+- L'admin ne peut **jamais** voir les assignations
+- Chaque participant a un **token unique** de 64 caractères
+- Les assignations ne peuvent être générées **qu'une seule fois** par événement
+
+## 🧪 Tests
+
+Lancer les tests :
+```bash
+php artisan test
+```
+
+## 📁 Structure
+
+```
+app/
+├── Http/Controllers/
+│   ├── AssignmentController.php    # Génération des assignations
+│   ├── EventController.php          # Gestion des événements
+│   ├── ParticipantController.php    # Gestion des participants/exclusions
+│   └── ParticipantAccessController.php  # Accès token-based
+├── Models/
+│   ├── Assignment.php               # Assignations cryptées
+│   ├── Event.php                    # Événements
+│   ├── Exclusion.php                # Exclusions
+│   └── Participant.php              # Participants avec tokens
+├── Notifications/
+│   └── SecretSantaAssignmentNotification.php  # Email aux participants
+└── Services/
+    └── AssignmentService.php        # Algorithme de matching
+```
+
+## 🛠️ Technologies
+
+- **Laravel 11** - Framework PHP
+- **Blade** - Moteur de templates
+- **Alpine.js** - JavaScript réactif
+- **Tailwind CSS** - Framework CSS
+- **SQLite** - Base de données (par défaut)
+
+## 📝 Notes
+
+- Le minimum de participants requis est **3**
+- Les assignations sont générées avec un algorithme de backtracking qui respecte les exclusions
+- Si les exclusions rendent le matching impossible, une erreur est affichée
+- Les participants peuvent consulter leur assignation autant de fois qu'ils le souhaitent
+
+## 🎄 Joyeux Noël !
