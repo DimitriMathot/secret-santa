@@ -22,8 +22,9 @@ jobs:
             docker compose exec -T app composer install --no-dev --optimize-autoloader --no-interaction
             docker compose exec -T app npm install
             docker compose exec -T app npm run build
-            docker compose exec -T app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+            docker compose exec -T app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
             docker compose exec -T app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            docker compose exec -T app chmod -R 755 /var/www/html/public/build
             docker compose exec -T app php artisan migrate --force
             docker compose exec -T app php artisan config:cache
             docker compose exec -T app php artisan route:cache
