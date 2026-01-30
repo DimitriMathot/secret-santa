@@ -44,7 +44,7 @@ services:
     networks:
       - secret-santa-network
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
 networks:
   secret-santa-network:
