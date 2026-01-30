@@ -60,8 +60,8 @@ class AssignmentService
         $exclusions = [];
 
         foreach ($participants as $participant) {
-            $exclusions[$participant->id] = $participant->excludedParticipants()
-                ->pluck('id')
+            $exclusions[$participant->id] = $participant->exclusions()
+                ->pluck('excluded_participant_id')
                 ->toArray();
         }
 
