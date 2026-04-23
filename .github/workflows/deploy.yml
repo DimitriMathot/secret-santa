@@ -37,7 +37,7 @@ jobs:
             docker compose exec -T db mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS secret_santa CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
             docker compose build app queue
-            docker compose up -d --remove-orphans
+            docker compose up -d --remove-orphans app nginx
 
             docker compose exec -T app composer install --no-dev --optimize-autoloader --no-interaction
             docker compose exec -T app npm ci
@@ -47,8 +47,11 @@ jobs:
             docker compose exec -T app php artisan route:cache
             docker compose exec -T app php artisan view:cache
             docker compose exec -T app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
-            docker compose exec -T app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-            docker compose exec -T app chmod -R 755 /var/www/html/public/build
+            docker compose exec -T app find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 775 {} \;
+            docker compose exec -T app find /var/www/html/storage /var/www/html/bootstrap/cache -type f -exec chmod 664 {} \;
+            docker compose exec -T app find /var/www/html/public/build -type d -exec chmod 755 {} \;
+            docker compose exec -T app find /var/www/html/public/build -type f -exec chmod 644 {} \;
 
+            docker compose up -d --no-deps queue
             docker compose restart app queue nginx
             docker image prune -f
