@@ -15,6 +15,15 @@
             <a href="{{ route('events.edit', $event) }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
                 Modifier
             </a>
+            <form action="{{ route('events.destroy', $event) }}" method="POST" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                    onclick="return confirm('Supprimer cet événement et toutes ses données ?')"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Supprimer
+                </button>
+            </form>
         </div>
     </div>
 
@@ -39,24 +48,26 @@
         </div>
 
         <!-- Add Participant Form -->
-        <form action="{{ route('events.participants.store', $event) }}" method="POST" class="mb-6">
-            @csrf
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div>
-                    <input type="text" name="name" placeholder="Nom" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+        @if(!$event->assignments_generated)
+            <form action="{{ route('events.participants.store', $event) }}" method="POST" class="mb-6">
+                @csrf
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div>
+                        <input type="text" name="name" placeholder="Nom" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <input type="email" name="email" placeholder="Email" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Ajouter
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <input type="email" name="email" placeholder="Email" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
-                </div>
-                <div>
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Ajouter
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        @endif
 
         <!-- Participants List -->
         <div class="space-y-3">
@@ -73,26 +84,29 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="flex gap-2">
-                            <button @click="showExclusions = !showExclusions" 
-                                class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                <span x-show="!showExclusions">Gérer exclusions</span>
-                                <span x-show="showExclusions">Masquer</span>
-                            </button>
-                            <form action="{{ route('events.participants.destroy', [$event, $participant]) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" 
-                                    onclick="return confirm('Supprimer ce participant ?')"
-                                    class="text-red-600 hover:text-red-700 text-sm font-medium">
-                                    Supprimer
+                        @if(!$event->assignments_generated)
+                            <div class="flex gap-2">
+                                <button @click="showExclusions = !showExclusions" 
+                                    class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                    <span x-show="!showExclusions">Gérer exclusions</span>
+                                    <span x-show="showExclusions">Masquer</span>
                                 </button>
-                            </form>
-                        </div>
+                                <form action="{{ route('events.participants.destroy', [$event, $participant]) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                        onclick="return confirm('Supprimer ce participant ?')"
+                                        class="text-red-600 hover:text-red-700 text-sm font-medium">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Exclusions Form -->
-                    <div x-show="showExclusions" x-transition class="mt-4 pt-4 border-t border-gray-200">
+                    @if(!$event->assignments_generated)
+                        <div x-show="showExclusions" x-transition class="mt-4 pt-4 border-t border-gray-200">
                         <form action="{{ route('events.participants.exclusions.store', [$event, $participant]) }}" method="POST">
                             @csrf
                             <div class="flex gap-2">
@@ -128,7 +142,8 @@
                                 @endforeach
                             </div>
                         @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             @empty
                 <p class="text-gray-500 text-center py-4">Aucun participant pour le moment.</p>
@@ -145,4 +160,3 @@ function eventManagement() {
 }
 </script>
 @endsection
-

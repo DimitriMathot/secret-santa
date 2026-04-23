@@ -85,4 +85,38 @@ class EventTest extends TestCase
 
         $response->assertSessionHasErrors();
     }
+
+    public function test_cannot_change_participants_after_assignments_are_generated(): void
+    {
+        $event = Event::factory()->create(['assignments_generated' => true]);
+        $participant = Participant::factory()->create(['event_id' => $event->id]);
+
+        $addResponse = $this->post(route('events.participants.store', $event), [
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+        ]);
+        $deleteResponse = $this->delete(route('events.participants.destroy', [$event, $participant]));
+
+        $addResponse->assertSessionHasErrors();
+        $deleteResponse->assertSessionHasErrors();
+        $this->assertDatabaseMissing('participants', [
+            'event_id' => $event->id,
+            'email' => 'jane@example.com',
+        ]);
+        $this->assertDatabaseHas('participants', [
+            'id' => $participant->id,
+        ]);
+    }
+
+    public function test_can_delete_event(): void
+    {
+        $event = Event::factory()->create();
+        $participant = Participant::factory()->create(['event_id' => $event->id]);
+
+        $response = $this->delete(route('events.destroy', $event));
+
+        $response->assertRedirect(route('events.index'));
+        $this->assertDatabaseMissing('events', ['id' => $event->id]);
+        $this->assertDatabaseMissing('participants', ['id' => $participant->id]);
+    }
 }

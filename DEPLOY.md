@@ -58,6 +58,8 @@ DB_DATABASE=secret_santa
 DB_USERNAME=secret_santa
 DB_PASSWORD=secret
 
+QUEUE_CONNECTION=database
+
 MAIL_MAILER=mailgun
 MAILGUN_DOMAIN=ton-domaine.mailgun.org
 MAILGUN_SECRET=ton_api_key

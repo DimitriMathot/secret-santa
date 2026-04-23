@@ -5,28 +5,50 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+concurrency:
+  group: secret-santa-production
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
     steps:
       - name: SSH deploy
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -euo pipefail
+
             cd /var/www/secret-santa
-            git pull
-            docker compose up -d --build
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            docker compose up -d db
+            until docker compose exec -T db mysqladmin ping -h localhost -u root -proot --silent; do
+              sleep 2
+            done
+            docker compose exec -T db mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS secret_santa CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+            docker compose build app queue
+            docker compose up -d --remove-orphans
+
             docker compose exec -T app composer install --no-dev --optimize-autoloader --no-interaction
-            docker compose exec -T app npm install
+            docker compose exec -T app npm ci
             docker compose exec -T app npm run build
-            docker compose exec -T app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
-            docker compose exec -T app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-            docker compose exec -T app chmod -R 755 /var/www/html/public/build
             docker compose exec -T app php artisan migrate --force
             docker compose exec -T app php artisan config:cache
             docker compose exec -T app php artisan route:cache
             docker compose exec -T app php artisan view:cache
+            docker compose exec -T app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
+            docker compose exec -T app chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            docker compose exec -T app chmod -R 755 /var/www/html/public/build
+
+            docker compose restart app queue nginx
             docker image prune -f

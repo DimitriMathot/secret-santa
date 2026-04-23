@@ -1,6 +1,6 @@
 # 🎅 Secret Santa Application
 
-Application web privée de Secret Santa construite avec Laravel 11, Blade et Alpine.js.
+Application web privée de Secret Santa construite avec Laravel 12, Blade et Alpine.js.
 
 ## ✨ Fonctionnalités
 
@@ -29,6 +29,9 @@ Application web privée de Secret Santa construite avec Laravel 11, Blade et Alp
 3. **Configurer la base de données**
    - Modifier `.env` avec vos paramètres de base de données
    - Par défaut, SQLite est utilisé : `database/database.sqlite`
+   ```bash
+   touch database/database.sqlite
+   ```
 
 4. **Lancer les migrations**
    ```bash
@@ -61,6 +64,13 @@ MAIL_FROM_NAME="Secret Santa"
 ```
 
 Pour le développement local, vous pouvez utiliser `MAIL_MAILER=log` pour voir les emails dans `storage/logs/laravel.log`.
+
+Si vous utilisez `QUEUE_CONNECTION=database`, lancez aussi un worker :
+```bash
+php artisan queue:work
+```
+
+Avec la configuration locale par défaut (`QUEUE_CONNECTION=sync`), aucun worker n'est nécessaire.
 
 ## 🎯 Utilisation
 
@@ -123,7 +133,7 @@ app/
 
 ## 🛠️ Technologies
 
-- **Laravel 11** - Framework PHP
+- **Laravel 12** - Framework PHP
 - **Blade** - Moteur de templates
 - **Alpine.js** - JavaScript réactif
 - **Tailwind CSS** - Framework CSS

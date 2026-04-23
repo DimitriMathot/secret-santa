@@ -11,7 +11,7 @@ class EventController extends Controller
     public function index(): View
     {
         $events = Event::withCount('participants')->latest()->get();
-        
+
         return view('events.index', compact('events'));
     }
 
@@ -37,7 +37,7 @@ class EventController extends Controller
     public function show(Event $event): View
     {
         $event->load('participants.excludedParticipants');
-        
+
         return view('events.show', compact('event'));
     }
 
@@ -58,5 +58,13 @@ class EventController extends Controller
 
         return redirect()->route('events.show', $event)
             ->with('success', 'Événement mis à jour avec succès');
+    }
+
+    public function destroy(Event $event)
+    {
+        $event->delete();
+
+        return redirect()->route('events.index')
+            ->with('success', 'Événement supprimé avec succès');
     }
 }

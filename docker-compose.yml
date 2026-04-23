@@ -28,6 +28,23 @@ services:
     depends_on:
       - app
 
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secret-santa-queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - secret-santa-network
+    depends_on:
+      - app
+      - db
+
   db:
     image: mysql:8.0
     container_name: secret-santa-db

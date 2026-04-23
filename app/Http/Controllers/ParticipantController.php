@@ -11,6 +11,10 @@ class ParticipantController extends Controller
 {
     public function store(Request $request, Event $event)
     {
+        if ($event->assignments_generated) {
+            return back()->withErrors(['error' => 'Les participants ne peuvent plus être modifiés après la génération des assignations.']);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -32,6 +36,10 @@ class ParticipantController extends Controller
 
     public function destroy(Event $event, Participant $participant)
     {
+        if ($event->assignments_generated) {
+            return back()->withErrors(['error' => 'Les participants ne peuvent plus être modifiés après la génération des assignations.']);
+        }
+
         // Ensure participant belongs to event
         if ($participant->event_id !== $event->id) {
             abort(404);
@@ -44,13 +52,17 @@ class ParticipantController extends Controller
 
     public function storeExclusion(Request $request, Event $event, Participant $participant)
     {
+        if ($event->assignments_generated) {
+            return back()->withErrors(['error' => 'Les exclusions ne peuvent plus être modifiées après la génération des assignations.']);
+        }
+
         $validated = $request->validate([
             'excluded_participant_id' => 'required|exists:participants,id',
         ]);
 
         // Ensure excluded participant belongs to same event
         $excludedParticipant = Participant::findOrFail($validated['excluded_participant_id']);
-        
+
         if ($excludedParticipant->event_id !== $event->id || $participant->event_id !== $event->id) {
             return back()->withErrors(['excluded_participant_id' => 'Participant invalide.']);
         }
@@ -78,6 +90,10 @@ class ParticipantController extends Controller
 
     public function destroyExclusion(Event $event, Participant $participant, Exclusion $exclusion)
     {
+        if ($event->assignments_generated) {
+            return back()->withErrors(['error' => 'Les exclusions ne peuvent plus être modifiées après la génération des assignations.']);
+        }
+
         // Ensure exclusion belongs to participant and event
         if ($exclusion->participant_id !== $participant->id || $participant->event_id !== $event->id) {
             abort(404);

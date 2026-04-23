@@ -12,7 +12,7 @@ Route::get('/participant/{token}', [ParticipantAccessController::class, 'show'])
 
 // Admin routes (events management)
 Route::get('/', [EventController::class, 'index'])->name('events.index');
-Route::resource('events', EventController::class);
+Route::resource('events', EventController::class)->except(['index']);
 
 // Participant management (within events)
 Route::post('events/{event}/participants', [ParticipantController::class, 'store'])

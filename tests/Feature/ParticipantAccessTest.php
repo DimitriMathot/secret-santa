@@ -40,7 +40,7 @@ class ParticipantAccessTest extends TestCase
         $participant1 = Participant::factory()->create(['event_id' => $event->id]);
         $participant2 = Participant::factory()->create(['event_id' => $event->id]);
 
-        $assignment = new Assignment();
+        $assignment = new Assignment;
         $assignment->event_id = $event->id;
         $assignment->participant_id = $participant1->id;
         $assignment->setAssignedToId($participant2->id);
@@ -61,6 +61,13 @@ class ParticipantAccessTest extends TestCase
             'event_id' => $event->id,
             'has_viewed_assignment' => false,
         ]);
+        $assignedParticipant = Participant::factory()->create(['event_id' => $event->id]);
+
+        $assignment = new Assignment;
+        $assignment->event_id = $event->id;
+        $assignment->participant_id = $participant->id;
+        $assignment->setAssignedToId($assignedParticipant->id);
+        $assignment->save();
 
         $this->assertNull($participant->viewed_at);
 

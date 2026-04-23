@@ -14,14 +14,28 @@
 
 2. **Configurer le `.env`** avec tes paramètres (base de données, Mailgun, etc.)
 
-3. **Générer la clé d'application** :
-   ```bash
-   docker compose exec app php artisan key:generate
+   Configuration minimale recommandée avec Docker :
+   ```env
+   APP_URL=http://localhost:8081
+
+   DB_CONNECTION=mysql
+   DB_HOST=db
+   DB_PORT=3306
+   DB_DATABASE=secret_santa
+   DB_USERNAME=secret_santa
+   DB_PASSWORD=secret
+
+   QUEUE_CONNECTION=database
    ```
 
-4. **Lancer les conteneurs** :
+3. **Lancer les conteneurs** :
    ```bash
-   docker compose up -d
+   docker compose up -d --build
+   ```
+
+4. **Générer la clé d'application** :
+   ```bash
+   docker compose exec app php artisan key:generate
    ```
 
 5. **Lancer les migrations** :
@@ -30,8 +44,8 @@
    ```
 
 6. **Accéder à l'application** :
-   - Application : http://localhost
-   - Base de données : localhost:3306
+   - Application : http://localhost:8081
+   - Base de données : localhost:3307
 
 ## Commandes utiles
 
@@ -64,6 +78,7 @@ docker compose up -d --build
 
 - `app` : Conteneur PHP-FPM avec Laravel
 - `nginx` : Serveur web Nginx
+- `queue` : Worker Laravel pour les emails et jobs en arrière-plan
 - `db` : Base de données MySQL
 
 ## Configuration de la base de données
